@@ -1,20 +1,25 @@
-// Package tree implements equivalence check of binary trees
+// Package tree implements equivalence check of binary trees.
 package tree
 
-import "golang.org/x/tour/tree"
+// Tree is a binary tree with integer values.
+type Tree struct {
+	Left  *Tree
+	Value int
+	Right *Tree
+}
 
 // New returns a sorted binary tree holding values from nums.
-func New(nums ...int) *tree.Tree {
-	var t *tree.Tree
+func New(nums ...int) *Tree {
+	var t *Tree
 	for _, n := range nums {
 		t = insert(t, n)
 	}
 	return t
 }
 
-func insert(t *tree.Tree, v int) *tree.Tree {
+func insert(t *Tree, v int) *Tree {
 	if t == nil {
-		return &tree.Tree{Left: nil, Value: v, Right: nil}
+		return &Tree{Left: nil, Value: v, Right: nil}
 	}
 	if v < t.Value {
 		t.Left = insert(t.Left, v)
@@ -25,12 +30,12 @@ func insert(t *tree.Tree, v int) *tree.Tree {
 }
 
 // Walk walks the tree t sending all values from the tree to the channel ch.
-func Walk(t *tree.Tree, ch chan int) {
+func Walk(t *Tree, ch chan int) {
 	defer close(ch)
 	walkRecursive(t, ch)
 }
 
-func walkRecursive(t *tree.Tree, ch chan int) {
+func walkRecursive(t *Tree, ch chan int) {
 	if t == nil {
 		return
 	}
@@ -41,7 +46,7 @@ func walkRecursive(t *tree.Tree, ch chan int) {
 }
 
 // Same determines whether the trees t1 and t2 store the same values.
-func Same(t1, t2 *tree.Tree) bool {
+func Same(t1, t2 *Tree) bool {
 	ch1 := make(chan int)
 	ch2 := make(chan int)
 
@@ -51,6 +56,7 @@ func Same(t1, t2 *tree.Tree) bool {
 	for {
 		v1, ok1 := <-ch1
 		v2, ok2 := <-ch2
+
 		if ok1 != ok2 || v1 != v2 {
 			return false
 		}

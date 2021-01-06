@@ -32,12 +32,8 @@ func TestWalk(t *testing.T) {
 
 			go Walk(New(tt.tree...), ch)
 
-			for {
-				val, ok := <-ch
-				if !ok {
-					break
-				}
-				nums = append(nums, val)
+			for v := range ch {
+				nums = append(nums, v)
 			}
 
 			for i, n := range nums {
@@ -55,12 +51,8 @@ func ExampleWalk() {
 	ch := make(chan int)
 	go Walk(New(5, -9, 8, 0), ch)
 
-	for {
-		val, ok := <-ch
-		if !ok {
-			break
-		}
-		fmt.Print(" ", val)
+	for v := range ch {
+		fmt.Print(" ", v)
 	}
 	// Output: -9 0 5 8
 }
@@ -81,7 +73,7 @@ func TestSame(t *testing.T) {
 			exp:  true,
 		},
 		{
-			name: "equal trees",
+			name: "equal",
 			t1:   []int{8, 13, 3, 5, 1, 1, 2},
 			t2:   []int{8, 3, 1, 1, 2, 5, 13},
 			exp:  true,
@@ -114,6 +106,38 @@ func TestSame(t *testing.T) {
 func ExampleSame() {
 	fmt.Println(Same(New(0, 0, 1, 0), New(0, 0, 1, 1)),
 		Same(New(1, 2, 3, 4), New(4, 3, 1, 2)))
-
 	// Output: false true
+}
+
+// BenchmarkSame checks Same function's performance.
+func BenchmarkSame(b *testing.B) {
+	trees := []struct {
+		name string
+		in1  []int
+		in2  []int
+	}{
+		{
+			name: "empty",
+			in1:  []int{},
+			in2:  []int{},
+		},
+		{
+			name: "equal",
+			in1:  []int{1, 2, 3, 4, 5, 6, 7},
+			in2:  []int{1, 2, 3, 4, 5, 6, 7},
+		},
+		{
+			name: "non-equal",
+			in1:  []int{5, -1, 9, 2},
+			in2:  []int{5, -9, -14, 0},
+		},
+	}
+
+	for _, tr := range trees {
+		b.Run(tr.name, func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				Same(New(tr.in1...), New(tr.in2...))
+			}
+		})
+	}
 }
