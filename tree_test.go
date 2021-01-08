@@ -2,6 +2,7 @@ package tree
 
 import (
 	"fmt"
+	"math/rand"
 	"reflect"
 	"testing"
 )
@@ -29,16 +30,12 @@ func TestWalk(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ch := make(chan int)
-			var nums []int
+			nums := []int{}
 
 			go Walk(New(tt.tree...), ch)
 
 			for v := range ch {
 				nums = append(nums, v)
-			}
-
-			if nums == nil && tt.tree != nil {
-				nums = []int{}
 			}
 
 			if !reflect.DeepEqual(nums, tt.exp) {
@@ -114,28 +111,7 @@ func ExampleSame() {
 
 // BenchmarkSame checks Same function's performance.
 func BenchmarkSame(b *testing.B) {
-	trees := []struct {
-		name string
-		in1  []int
-		in2  []int
-	}{
-		{
-			name: "equal",
-			in1:  []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-			in2:  []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-		},
-		{
-			name: "non-equal",
-			in1:  []int{5, -1, 9, 12, -55, 16, 2, 0, 17, -8},
-			in2:  []int{5, -9, 14, 0, 17, -1, 2, -55, 16, 4},
-		},
-	}
-
-	for _, tr := range trees {
-		b.Run(tr.name, func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				Same(New(tr.in1...), New(tr.in2...))
-			}
-		})
+	for i := 0; i < b.N; i++ {
+		Same(New(rand.Perm(1000)...), New(rand.Perm(1000)...))
 	}
 }
