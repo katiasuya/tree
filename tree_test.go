@@ -2,7 +2,6 @@ package tree
 
 import (
 	"fmt"
-	"reflect"
 	"testing"
 )
 
@@ -37,8 +36,11 @@ func TestWalk(t *testing.T) {
 				nums = append(nums, v)
 			}
 
-			if !reflect.DeepEqual(tt.exp, nums) {
-				t.Errorf("Expected %v, got %v", tt.exp, nums)
+			for i, n := range nums {
+				if n != tt.exp[i] {
+					t.Errorf("Expected %v, got %v", tt.exp, nums)
+					break
+				}
 			}
 		})
 	}
@@ -115,14 +117,19 @@ func BenchmarkSame(b *testing.B) {
 		in2  []int
 	}{
 		{
+			name: "empty",
+			in1:  []int{},
+			in2:  []int{},
+		},
+		{
 			name: "equal",
-			in1:  []int{1, 2, 3, 4, 5, 6, 7, 8},
-			in2:  []int{1, 2, 3, 4, 5, 6, 7, 8},
+			in1:  []int{1, 2, 3, 4, 5, 6, 7},
+			in2:  []int{1, 2, 3, 4, 5, 6, 7},
 		},
 		{
 			name: "non-equal",
-			in1:  []int{5, -1, 9, 12, -55, 16, 2, 0},
-			in2:  []int{5, -9, 14, 0, 17, -1, 2, -55},
+			in1:  []int{5, -1, 9, 2},
+			in2:  []int{5, -9, -14, 0},
 		},
 	}
 

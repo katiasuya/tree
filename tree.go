@@ -9,16 +9,17 @@ type Tree struct {
 }
 
 // New returns a sorted binary tree holding values from nums.
-func New(nums ...int) (t *Tree) {
+func New(nums ...int) *Tree {
+	var t *Tree
 	for _, n := range nums {
 		t = insert(t, n)
 	}
-	return
+	return t
 }
 
 func insert(t *Tree, v int) *Tree {
 	if t == nil {
-		return &Tree{Value: v}
+		return &Tree{Left: nil, Value: v, Right: nil}
 	}
 	if v < t.Value {
 		t.Left = insert(t.Left, v)
