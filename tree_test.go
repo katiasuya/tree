@@ -2,6 +2,7 @@ package tree
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 )
 
@@ -36,11 +37,12 @@ func TestWalk(t *testing.T) {
 				nums = append(nums, v)
 			}
 
-			for i, n := range nums {
-				if n != tt.exp[i] {
-					t.Errorf("Expected %v, got %v", tt.exp, nums)
-					break
-				}
+			if nums == nil && tt.tree != nil {
+				nums = []int{}
+			}
+
+			if !reflect.DeepEqual(nums, tt.exp) {
+				t.Errorf("Expected %v, got %v", tt.exp, nums)
 			}
 		})
 	}
@@ -91,6 +93,7 @@ func TestSame(t *testing.T) {
 			exp:  false,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := Same(New(tt.t1...), New(tt.t2...))
@@ -106,7 +109,7 @@ func TestSame(t *testing.T) {
 func ExampleSame() {
 	fmt.Println(Same(New(0, 0, 1, 0), New(0, 0, 1, 1)),
 		Same(New(1, 2, 3, 4), New(4, 3, 1, 2)))
-	// Output: false true
+	//Output: false true
 }
 
 // BenchmarkSame checks Same function's performance.
@@ -117,19 +120,14 @@ func BenchmarkSame(b *testing.B) {
 		in2  []int
 	}{
 		{
-			name: "empty",
-			in1:  []int{},
-			in2:  []int{},
-		},
-		{
 			name: "equal",
-			in1:  []int{1, 2, 3, 4, 5, 6, 7},
-			in2:  []int{1, 2, 3, 4, 5, 6, 7},
+			in1:  []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+			in2:  []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 		},
 		{
 			name: "non-equal",
-			in1:  []int{5, -1, 9, 2},
-			in2:  []int{5, -9, -14, 0},
+			in1:  []int{5, -1, 9, 12, -55, 16, 2, 0, 17, -8},
+			in2:  []int{5, -9, 14, 0, 17, -1, 2, -55, 16, 4},
 		},
 	}
 
